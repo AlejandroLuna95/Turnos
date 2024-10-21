@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Turnos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        input[type="text"], input[type="date"], input[type="time"], input[type="tel"] {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #218838;
+        }
+        .turnos {
+            margin-top: 20px;
+        }
+        .turno {
+            padding: 10px;
+            background: #e9ecef;
+            margin: 5px 0;
+            border-radius: 4px;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Sistema de Turnos</h1>
+        
+        <form id="registroForm">
+            <h2>Registro</h2>
+            <input type="tel" id="celular" placeholder="Número de Celular" required pattern="[0-9]{10}">
+            <button type="submit">Registrarse</button>
+        </form>
+
+        <form id="turnoForm" class="hidden">
+            <h2>Reservar Turno</h2>
+            <input type="date" id="fecha" required>
+            <input type="time" id="hora" required>
+            <button type="submit">Reservar Turno</button>
+        </form>
+
+        <div class="turnos" id="turnosList">
+            <h2>Turnos Reservados</h2>
+        </div>
+    </div>
+
+    <script>
+        const registroForm = document.getElementById('registroForm');
+        const turnoForm = document.getElementById('turnoForm');
+        const turnosList = document.getElementById('turnosList');
+
+        let celularUsuario;
+
+        // Cargar turnos de localStorage
+        function cargarTurnos() {
+            const turnosGuardados = JSON.parse(localStorage.getItem('turnos')) || [];
+            turnosGuardados.forEach(turnoTexto => {
+                const nuevoTurno = document.createElement('div');
+                nuevoTurno.classList.add('turno');
+                nuevoTurno.textContent = turnoTexto;
+                turnosList.appendChild(nuevoTurno);
+            });
+        }
+
+        // Guardar turnos en localStorage
+        function guardarTurnos() {
+            const turnos = [];
+            document.querySelectorAll('.turno').forEach(turno => {
+                turnos.push(turno.textContent);
+            });
+            localStorage.setItem('turnos', JSON.stringify(turnos));
+        }
+
+        // Inicialmente carga los turnos cuando la página se carga
+        cargarTurnos();
+
+        registroForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            celularUsuario = document.getElementById('celular').value;
+
+            // Muestra el formulario de reservas y oculta el de registro
+            registroForm.classList.add('hidden');
+            turnoForm.classList.remove('hidden');
+
+            // Limpia el campo del número de celular
+            registroForm.reset();
+        });
+
+        turnoForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const fecha = document.getElementById('fecha').value;
+            const hora = document.getElementById('hora').value;
+
+            const nuevoTurno = document.createElement('div');
+            nuevoTurno.classList.add('turno');
+            nuevoTurno.textContent = `Celular: ${celularUsuario}, Fecha: ${fecha}, Hora: ${hora}`;
+            turnosList.appendChild(nuevoTurno);
+
+            // Guardar los turnos en localStorage
+            guardarTurnos();
+
+            // Limpiar el formulario de turnos
+            turnoForm.reset();
+        });
+    </script>
+
+</body>
+</html>
